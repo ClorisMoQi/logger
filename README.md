@@ -6,10 +6,10 @@
 
 
 ### 支持不同日志级别的可控输出
-#### 1. Debug
-#### 2. Trace
-#### 3. Info
-#### 4. Warn
-#### 5. Error
-#### 6. Fatal
+1. Debug
+2. Trace
+3. Info
+4. Warn
+5. Error
+6. Fatal
 

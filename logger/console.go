@@ -19,27 +19,27 @@ func NewLogger(lvstr string) *Logger {
 }
 
 func (l *Logger) Debug(identifier string, format string, args ...interface{}) {
+	l.log(DEBUG, identifier, format, args...)
+}
+
+func (l *Logger) Trace(identifier string, format string, args ...interface{}) {
+	l.log(TRACE, identifier, format, args...)
+}
+
+func (l *Logger) Info(identifier string, format string, args ...interface{}) {
+	l.log(INFO, identifier, format, args...)
+}
+
+func (l *Logger) Warn(identifier string, format string, args ...interface{}) {
+	l.log(WARN, identifier, format, args...)
+}
+
+func (l *Logger) Error(identifier string, format string, args ...interface{}) {
 	l.log(ERROR, identifier, format, args...)
 }
 
-func (l *Logger) Trace(identifier string, msg string) {
-	l.log(ERROR, identifier, msg)
-}
-
-func (l *Logger) Info(identifier string, msg string) {
-	l.log(ERROR, identifier, msg)
-}
-
-func (l *Logger) Warn(identifier string, msg string) {
-	l.log(ERROR, identifier, msg)
-}
-
-func (l *Logger) Error(identifier string, msg string) {
-	l.log(ERROR, identifier, msg)
-}
-
-func (l *Logger) Fatal(identifier string, msg string) {
-	l.log(FATAL, identifier, msg)
+func (l *Logger) Fatal(identifier string, format string, args ...interface{}) {
+	l.log(FATAL, identifier, format, args...)
 }
 
 func (l *Logger) log(lv LogLevel, identifier string, format string, args ...interface{}) {
