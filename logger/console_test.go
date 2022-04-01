@@ -9,42 +9,42 @@ func TestNewLogger(t *testing.T) {
 	tests := []struct {
 		name  string
 		lvstr string
-		want  *Logger
+		want  *CLogger
 	}{
 		{
 			name:  "DEBUG",
 			lvstr: "DEBUG",
-			want:  &Logger{Lv: DEBUG},
+			want:  &CLogger{Lv: DEBUG},
 		},
 		{
 			name:  "TRACE",
 			lvstr: "TRACE",
-			want:  &Logger{Lv: TRACE},
+			want:  &CLogger{Lv: TRACE},
 		},
 		{
 			name:  "INFO",
 			lvstr: "INFO",
-			want:  &Logger{Lv: INFO},
+			want:  &CLogger{Lv: INFO},
 		},
 		{
 			name:  "WARN",
 			lvstr: "WARN",
-			want:  &Logger{Lv: WARN},
+			want:  &CLogger{Lv: WARN},
 		},
 		{
 			name:  "ERROR",
 			lvstr: "ERROR",
-			want:  &Logger{Lv: ERROR},
+			want:  &CLogger{Lv: ERROR},
 		},
 		{
 			name:  "FATAL",
 			lvstr: "FATAL",
-			want:  &Logger{Lv: FATAL},
+			want:  &CLogger{Lv: FATAL},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := NewLogger(tt.lvstr); !reflect.DeepEqual(got, tt.want) {
+			if got := NewCLogger(tt.lvstr); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewLogger() = %v, want %v", got, tt.want)
 			}
 		})
@@ -56,20 +56,20 @@ func TestLogger_Debug(t *testing.T) {
 	name := "DebugLog"
 	tests := []struct {
 		name       string
-		l          *Logger
+		l          *CLogger
 		identifier string
 		format     string
 		args       []interface{}
 	}{
 		{
 			name:       "DEBUG",
-			l:          &Logger{Lv: DEBUG},
+			l:          &CLogger{Lv: DEBUG},
 			identifier: "debug",
 			format:     "This is a debug log, id: %d, name:%s\n",
 		},
 		{
 			name:       "TRACE",
-			l:          &Logger{Lv: TRACE},
+			l:          &CLogger{Lv: TRACE},
 			identifier: "trace",
 			format:     "This is a trace log, id: %d, name:%s\n",
 		},
@@ -89,7 +89,7 @@ func TestLogger_Trace(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		l    *Logger
+		l    *CLogger
 		args args
 	}{
 		// TODO: Add test cases.
@@ -109,7 +109,7 @@ func TestLogger_Info(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		l    *Logger
+		l    *CLogger
 		args args
 	}{
 		// TODO: Add test cases.
@@ -129,7 +129,7 @@ func TestLogger_Warn(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		l    *Logger
+		l    *CLogger
 		args args
 	}{
 		// TODO: Add test cases.
@@ -149,7 +149,7 @@ func TestLogger_Error(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		l    *Logger
+		l    *CLogger
 		args args
 	}{
 		// TODO: Add test cases.
@@ -169,7 +169,7 @@ func TestLogger_Fatal(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		l    *Logger
+		l    *CLogger
 		args args
 	}{
 		// TODO: Add test cases.
@@ -190,7 +190,7 @@ func TestLogger_log(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		l    *Logger
+		l    *CLogger
 		args args
 	}{
 		// TODO: Add test cases.

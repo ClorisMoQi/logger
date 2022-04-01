@@ -7,42 +7,42 @@ import (
 	"time"
 )
 
-type Logger struct {
+type CLogger struct {
 	Lv LogLevel
 }
 
-func NewLogger(lvstr string) *Logger {
+func NewCLogger(lvstr string) *CLogger {
 	lv := LogLvStr2Int(lvstr)
-	return &Logger{
+	return &CLogger{
 		Lv: lv,
 	}
 }
 
-func (l *Logger) Debug(identifier string, format string, args ...interface{}) {
+func (l *CLogger) Debug(identifier string, format string, args ...interface{}) {
 	l.log(DEBUG, identifier, format, args...)
 }
 
-func (l *Logger) Trace(identifier string, format string, args ...interface{}) {
+func (l *CLogger) Trace(identifier string, format string, args ...interface{}) {
 	l.log(TRACE, identifier, format, args...)
 }
 
-func (l *Logger) Info(identifier string, format string, args ...interface{}) {
+func (l *CLogger) Info(identifier string, format string, args ...interface{}) {
 	l.log(INFO, identifier, format, args...)
 }
 
-func (l *Logger) Warn(identifier string, format string, args ...interface{}) {
+func (l *CLogger) Warn(identifier string, format string, args ...interface{}) {
 	l.log(WARN, identifier, format, args...)
 }
 
-func (l *Logger) Error(identifier string, format string, args ...interface{}) {
+func (l *CLogger) Error(identifier string, format string, args ...interface{}) {
 	l.log(ERROR, identifier, format, args...)
 }
 
-func (l *Logger) Fatal(identifier string, format string, args ...interface{}) {
+func (l *CLogger) Fatal(identifier string, format string, args ...interface{}) {
 	l.log(FATAL, identifier, format, args...)
 }
 
-func (l *Logger) log(lv LogLevel, identifier string, format string, args ...interface{}) {
+func (l *CLogger) log(lv LogLevel, identifier string, format string, args ...interface{}) {
 	if l.Lv <= lv {
 		msg := fmt.Sprintf(format, args...)
 		now := time.Now()
