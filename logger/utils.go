@@ -13,7 +13,7 @@ const (
 	FATAL
 )
 
-func parseLogLevel(s string) LogLevel {
+func LogLvStr2Int(s string) LogLevel {
 	s = strings.ToLower(s)
 	switch s {
 	case "debug":
@@ -31,4 +31,23 @@ func parseLogLevel(s string) LogLevel {
     default:
         return DEBUG
 	}
+}
+
+func LogLvInt2Str(lv LogLevel) string {
+    switch lv {
+    case DEBUG:
+        return "DEBUG"
+    case TRACE:
+        return "TRACE"
+    case INFO:
+        return "INFO"
+    case WARN:
+        return "WARN"
+    case ERROR:
+        return "ERROR"
+    case FATAL:
+        return "FATAL"
+    default:
+        return "DEBUG"
+    }
 }
