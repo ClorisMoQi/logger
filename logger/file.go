@@ -25,6 +25,7 @@ func NewFLogger(lvstr, filepath, filename string, maxsize int64) *FLogger {
 		Lv:       logLv,
 		FilePath: filepath,
 		FileName: filename,
+        ErrFileName: filename + ".err",
 		MaxSize:  maxsize,
 	}
     err := fl.initFile()
@@ -73,20 +74,28 @@ func (l *FLogger) log(lv LogLevel, identifier string, format string, args ...int
         if lv >= ERROR {
 		    fmt.Fprintf(l.ErrFileObj, "[%s] [%s] caller: %s, func:[%s] identifier: %s, message: %s\n", lvstr, now.Format("2006-01-02 15:04:05"), caller, funcname, identifier, msg)
         }
+        if l.checksize() {
+            l.FileObj.Close()
+            nowstr := time.Now().Format("20060102150405000")
+            logName := path.Join(l.FilePath, l.FileName)
+            newFileName := fmt.Sprintf("%s.bak%s", logName, nowstr)
+            os.Rename(logName, newFileName)
+        }
     }
 }
 
 func (l *FLogger) initFile() error {
     fullpath := path.Join(l.FilePath, l.FileName)
+    fmt.Println(fullpath)
     fileObj, err := os.OpenFile(fullpath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
     if err != nil {
-        fmt.Println("open log file failed, err: %v\n", err)
+        fmt.Printf("open log file failed, err: %v\n", err)
         return err
     }
     errfullpath := path.Join(l.FilePath, l.ErrFileName)
     errfileObj, err := os.OpenFile(errfullpath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
     if err != nil {
-        fmt.Println("open log file failed, err: %v\n", err)
+        fmt.Printf("open log file failed, err: %v\n", err)
         return err
     }
     l.FileObj = fileObj
@@ -94,7 +103,16 @@ func (l *FLogger) initFile() error {
     return nil
 }
 
-func (l *FLogger) close() {
+func (l *FLogger)close() {
     l.FileObj.Close()
     l.ErrFileObj.Close()
+}
+
+func (l *FLogger)checksize() bool {
+    fileInfo, err := l.FileObj.Stat()
+    if err != nil {
+        fmt.Printf("get file info failed, err:%v\n", err)
+        return false
+    }
+    return fileInfo.Size() >= l.MaxSize
 }

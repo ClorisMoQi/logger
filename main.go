@@ -5,12 +5,13 @@ import (
 )
 
 func main() {
-	// log.Fatal("1111111")
-	logger := logger.NewCLogger("debug")
-	id := 10010
+	// clog.Fatal("1111111")
+	clog := logger.NewCLogger("debug")
+	id := 10001
 	name := "testLog"
-	logger.Debug("test", "This is a debug log, id: %d, name:%s\n", id, name)
+	clog.Debug("test", "This is a debug log, id: %d, name:%s", id, name)
 
-	log = logger.NewFLogger("debug", "./", "test.log", 10*1024*1024)
-	
+	flog := logger.NewFLogger("debug", "./", "test.log", 10*1024*1024)
+	flog.Debug("Debug", "This is a debug log, id:%d, name:%s", id, name)
+	flog.Error("Error", "This is an error log, id:%d, name:%s", id, name)
 }
