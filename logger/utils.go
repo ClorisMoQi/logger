@@ -2,6 +2,15 @@ package logger
 
 import "strings"
 
+type Logger interface{
+    Debug(identifier string, format string, args ...interface{})
+    Trace(identifier string, format string, args ...interface{})
+    Info(identifier string, format string, args ...interface{})
+    Warn(identifier string, format string, args ...interface{})
+    Error(identifier string, format string, args ...interface{})
+    Fatal(identifier string, format string, args ...interface{})
+}
+
 type LogLevel uint16
 
 const (
