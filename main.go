@@ -11,7 +11,9 @@ func main() {
 	name := "testLog"
 	clog.Debug("test", "This is a debug log, id: %d, name:%s", id, name)
 
-	flog := logger.NewFLogger("debug", "./", "test.log", 10*1024*1024)
-	flog.Debug("Debug", "This is a debug log, id:%d, name:%s", id, name)
-	flog.Error("Error", "This is an error log, id:%d, name:%s", id, name)
+	for {
+		flog := logger.NewFLogger("debug", "./", "test.log", 10*1024)
+		flog.Debug("Debug", "This is a debug log, id:%d, name:%s", id, name)
+		flog.Error("Error", "This is an error log, id:%d, name:%s", id, name)
+	}	
 }

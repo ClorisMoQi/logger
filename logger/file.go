@@ -71,15 +71,17 @@ func (l *FLogger) log(lv LogLevel, identifier string, format string, args ...int
 		funcname := runtime.FuncForPC(pc).Name()
 		caller := file + ":" + strconv.Itoa(line)
 		fmt.Fprintf(l.FileObj, "[%s] [%s] caller: %s, func:[%s] identifier: %s, message: %s\n", lvstr, now.Format("2006-01-02 15:04:05"), caller, funcname, identifier, msg)
+        if l.checksize(l.FileObj) {
+            // 需要切割日志文件
+            fileObjNew := l.splitFile(l.FileObj)
+            l.FileObj = fileObjNew
+        }
         if lv >= ERROR {
 		    fmt.Fprintf(l.ErrFileObj, "[%s] [%s] caller: %s, func:[%s] identifier: %s, message: %s\n", lvstr, now.Format("2006-01-02 15:04:05"), caller, funcname, identifier, msg)
-        }
-        if l.checksize() {
-            l.FileObj.Close()
-            nowstr := time.Now().Format("20060102150405000")
-            logName := path.Join(l.FilePath, l.FileName)
-            newFileName := fmt.Sprintf("%s.bak%s", logName, nowstr)
-            os.Rename(logName, newFileName)
+            if l.checksize(l.ErrFileObj) {
+                errFileObjNew := l.splitFile(l.ErrFileObj)
+                l.ErrFileObj = errFileObjNew
+            }
         }
     }
 }
@@ -103,16 +105,38 @@ func (l *FLogger) initFile() error {
     return nil
 }
 
-func (l *FLogger)close() {
-    l.FileObj.Close()
-    l.ErrFileObj.Close()
-}
+// func (l *FLogger)close() {
+//     l.FileObj.Close()
+//     l.ErrFileObj.Close()
+// }
 
-func (l *FLogger)checksize() bool {
-    fileInfo, err := l.FileObj.Stat()
+func (l *FLogger)checksize(fileObj *os.File) bool {
+    fileInfo, err := fileObj.Stat()
     if err != nil {
         fmt.Printf("get file info failed, err:%v\n", err)
         return false
     }
     return fileInfo.Size() >= l.MaxSize
+}
+
+func (l *FLogger)splitFile(fileObj *os.File) (*os.File) {
+    // 1. 关闭当前日志文件
+    fileInfo, err := fileObj.Stat()
+    if err != nil {
+        return nil
+    }
+    curFileName := path.Join(l.FilePath, fileInfo.Name())
+    fileObj.Close()
+    // 2. 备份并重命名文件
+    nowstr := time.Now().Format("20060102150405000")
+    newFileName := fmt.Sprintf("%s.bak%s", curFileName, nowstr)
+    os.Rename(curFileName, newFileName)
+    // 3. 打开一个新的日志文件
+    fileObjNew, err := os.OpenFile(curFileName, os.O_CREATE|os.O_APPEND|os.O_WRONLY, 0644)
+    if err != nil {
+        fmt.Printf("Open new log file failed, err:%v\n", err)
+        return nil
+    }
+    // 4. 将打开的新日志文件对象赋值给l.FileObj
+    return fileObjNew
 }
