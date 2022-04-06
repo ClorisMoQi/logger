@@ -53,6 +53,6 @@ func (l *CLogger) log(lv LogLevel, identifier string, format string, args ...int
 		}
 		funcname := runtime.FuncForPC(pc).Name()
 		caller := file + ":" + strconv.Itoa(line)
-		fmt.Printf("[%s] [%s] caller: %s, func:[%s] identifier: %s, message: %s\n", lvstr, now.Format("2006-01-02 15:04:05"), caller, funcname, identifier, msg)
+		fmt.Printf("[%s] [%s] caller: %s, func:[%s] identifier: %s, message: %s\n", now.Format("2006-01-02 15:04:05"), lvstr, caller, funcname, identifier, msg)
 	}
 }

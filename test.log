@@ -1,3 +1,5 @@
-[ERROR] [2022-04-05 17:48:19] caller: c:/Users/cloris.l/Desktop/logger/logger/main.go:22, func:[main.main] identifier: Error, message: This is an error log, id:10001, name:testLog
-[DEBUG] [2022-04-05 17:53:03] caller: c:/Users/cloris.l/Desktop/logger/logger/main.go:25, func:[main.main] identifier: Debug, message: This is a debug log, id:10001, name:testLog
-[ERROR] [2022-04-05 17:53:03] caller: c:/Users/cloris.l/Desktop/logger/logger/main.go:26, func:[main.main] identifier: Error, message: This is an error log, id:10001, name:testLog
+[2022-04-06 21:47:48] [DEBUG] caller: c:/Users/cloris.l/Desktop/logger/logger/main.go:15, func:[main.main] identifier: Error, message: This is an error log, id:10001, name:testLog
+[2022-04-06 21:47:48] [DEBUG] caller: c:/Users/cloris.l/Desktop/logger/logger/main.go:14, func:[main.main] identifier: Debug, message: This is a debug log, id:10001, name:testLog
+[2022-04-06 21:47:48] [DEBUG] caller: c:/Users/cloris.l/Desktop/logger/logger/main.go:15, func:[main.main] identifier: Error, message: This is an error log, id:10001, name:testLog
+[2022-04-06 21:47:48] [DEBUG] caller: c:/Users/cloris.l/Desktop/logger/logger/main.go:14, func:[main.main] identifier: Debug, message: This is a debug log, id:10001, name:testLog
+[2022-04-06 21:47:48] [DEBUG] caller: c:/Users/cloris.l/Desktop/logger/logger/main.go:15, func:[main.main] identifier: Error, message: This is an error log, id:10001, name:testLog

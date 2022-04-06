@@ -13,6 +13,5 @@ func main() {
 	for {
 		flog.Debug("Debug", "This is a debug log, id:%d, name:%s", id, name)
 		flog.Error("Error", "This is an error log, id:%d, name:%s", id, name)
-		break
 	}	
 }

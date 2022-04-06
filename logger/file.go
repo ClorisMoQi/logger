@@ -84,6 +84,7 @@ func (l *FLogger) log(lv LogLevel, identifier string, format string, args ...int
         case l.LogChan <- logTmp:
         default:
             // 当LogChan满了，日志被丢掉，保证不出现阻塞
+            time.Sleep(time.Millisecond * 500)
         }
         
     }
@@ -105,6 +106,7 @@ func (l *FLogger) initFile() error {
     }
     l.FileObj = fileObj
     l.ErrFileObj = errfileObj
+    go l.write() // 开启后台goroutine写log到文件里
     return nil
 }
 
@@ -147,21 +149,27 @@ func (l *FLogger)splitFile(fileObj *os.File) (*os.File) {
 // write log in background
 func (l *FLogger) write() {
     for {
-        logTmp := <-l.LogChan
-        lvstr := LogLvInt2Str(l.Lv)
-        caller := logTmp.fileName + ":" + strconv.Itoa(logTmp.line)
-        fmt.Fprintf(l.FileObj, "[%s] [%s] caller: %s, func:[%s] identifier: %s, message: %s\n", lvstr, logTmp.timestamp, caller, logTmp.funcName, logTmp.identifier, logTmp.msg)
-        if l.checksize(l.FileObj) {
-            // 需要切割日志文件
-            fileObjNew := l.splitFile(l.FileObj)
-            l.FileObj = fileObjNew
-        }
-        if l.Lv >= ERROR {
-		    fmt.Fprintf(l.ErrFileObj, "[%s] [%s] caller: %s, func:[%s] identifier: %s, message: %s\n", lvstr, logTmp.timestamp, caller, logTmp.funcName, logTmp.identifier, logTmp.msg)
-            if l.checksize(l.ErrFileObj) {
-                errFileObjNew := l.splitFile(l.ErrFileObj)
-                l.ErrFileObj = errFileObjNew
+        select {
+        case logTmp := <-l.LogChan:
+            lvstr := LogLvInt2Str(l.Lv)
+            caller := logTmp.fileName + ":" + strconv.Itoa(logTmp.line)
+            logMsg := fmt.Sprintf("[%s] [%s] caller: %s, func:[%s] identifier: %s, message: %s\n", logTmp.timestamp, lvstr, caller, logTmp.funcName, logTmp.identifier, logTmp.msg)
+            fmt.Fprintf(l.FileObj, logMsg)
+            if l.checksize(l.FileObj) {
+                // 需要切割日志文件
+                fileObjNew := l.splitFile(l.FileObj)
+                l.FileObj = fileObjNew
             }
+            if logTmp.lv >= ERROR {
+                fmt.Fprintf(l.ErrFileObj, logMsg)
+                if l.checksize(l.ErrFileObj) {
+                    errFileObjNew := l.splitFile(l.ErrFileObj)
+                    l.ErrFileObj = errFileObjNew
+                }
+            }
+        default:
+            time.Sleep(time.Millisecond * 500)
         }
+        
     }
 }
