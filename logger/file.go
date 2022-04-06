@@ -17,6 +17,7 @@ type FLogger struct {
     FileObj     *os.File
     ErrFileObj  *os.File
 	MaxSize     int64
+    LogChan     chan *logMsg
 }
 
 func NewFLogger(lvstr, filepath, filename string, maxsize int64) *FLogger {
@@ -27,6 +28,7 @@ func NewFLogger(lvstr, filepath, filename string, maxsize int64) *FLogger {
 		FileName: filename,
         ErrFileName: filename + ".err",
 		MaxSize:  maxsize,
+        LogChan: make(chan *logMsg, ChanSize),
 	}
     err := fl.initFile()
     if err != nil {
@@ -63,26 +65,27 @@ func (l *FLogger) log(lv LogLevel, identifier string, format string, args ...int
 	if l.Lv <= lv {
 		msg := fmt.Sprintf(format, args...)
 		now := time.Now()
-		lvstr := LogLvInt2Str(lv)
 		pc, file, line, ok := runtime.Caller(2)
 		if !ok {
 			return
 		}
 		funcname := runtime.FuncForPC(pc).Name()
-		caller := file + ":" + strconv.Itoa(line)
-		fmt.Fprintf(l.FileObj, "[%s] [%s] caller: %s, func:[%s] identifier: %s, message: %s\n", lvstr, now.Format("2006-01-02 15:04:05"), caller, funcname, identifier, msg)
-        if l.checksize(l.FileObj) {
-            // 需要切割日志文件
-            fileObjNew := l.splitFile(l.FileObj)
-            l.FileObj = fileObjNew
+		// 把日志发送到通道中
+        logTmp := &logMsg{
+            lv: lv,
+            identifier:identifier,
+            msg: msg,
+            funcName: funcname,
+            line:line,
+            fileName: file,
+            timestamp: now.Format("2006-01-02 15:04:05"),
         }
-        if lv >= ERROR {
-		    fmt.Fprintf(l.ErrFileObj, "[%s] [%s] caller: %s, func:[%s] identifier: %s, message: %s\n", lvstr, now.Format("2006-01-02 15:04:05"), caller, funcname, identifier, msg)
-            if l.checksize(l.ErrFileObj) {
-                errFileObjNew := l.splitFile(l.ErrFileObj)
-                l.ErrFileObj = errFileObjNew
-            }
+        select {
+        case l.LogChan <- logTmp:
+        default:
+            // 当LogChan满了，日志被丢掉，保证不出现阻塞
         }
+        
     }
 }
 
@@ -139,4 +142,26 @@ func (l *FLogger)splitFile(fileObj *os.File) (*os.File) {
     }
     // 4. 将打开的新日志文件对象赋值给l.FileObj
     return fileObjNew
+}
+
+// write log in background
+func (l *FLogger) write() {
+    for {
+        logTmp := <-l.LogChan
+        lvstr := LogLvInt2Str(l.Lv)
+        caller := logTmp.fileName + ":" + strconv.Itoa(logTmp.line)
+        fmt.Fprintf(l.FileObj, "[%s] [%s] caller: %s, func:[%s] identifier: %s, message: %s\n", lvstr, logTmp.timestamp, caller, logTmp.funcName, logTmp.identifier, logTmp.msg)
+        if l.checksize(l.FileObj) {
+            // 需要切割日志文件
+            fileObjNew := l.splitFile(l.FileObj)
+            l.FileObj = fileObjNew
+        }
+        if l.Lv >= ERROR {
+		    fmt.Fprintf(l.ErrFileObj, "[%s] [%s] caller: %s, func:[%s] identifier: %s, message: %s\n", lvstr, logTmp.timestamp, caller, logTmp.funcName, logTmp.identifier, logTmp.msg)
+            if l.checksize(l.ErrFileObj) {
+                errFileObjNew := l.splitFile(l.ErrFileObj)
+                l.ErrFileObj = errFileObjNew
+            }
+        }
+    }
 }

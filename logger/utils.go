@@ -1,6 +1,12 @@
 package logger
 
-import "strings"
+import (
+	"strings"
+)
+
+const (
+    ChanSize = 10000
+)
 
 type Logger interface{
     Debug(identifier string, format string, args ...interface{})
@@ -60,3 +66,14 @@ func LogLvInt2Str(lv LogLevel) string {
         return "DEBUG"
     }
 }
+
+type logMsg struct {
+    lv          LogLevel
+    identifier  string
+    msg         string
+    funcName    string
+    line        int
+    fileName    string
+    timestamp   string
+}
+
