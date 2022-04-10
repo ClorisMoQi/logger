@@ -13,3 +13,4 @@
 5. Error
 6. Fatal
 
+### 支持异步写log文件
